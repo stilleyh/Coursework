@@ -15,7 +15,7 @@ pthread_mutex_t mutex;
 int cnt = 1;
 int numreader = 0;
 
-void *writer(void *wno)
+void *writer(void *wno, CSem* csem)
 {   
     sem_wait(&wrt);
     cnt = cnt*2;
@@ -23,7 +23,7 @@ void *writer(void *wno)
     sem_post(&wrt);
     return NULL;
 }
-void *reader(void *rno)
+void *reader(void *rno, CSem* csem)
 {   
     sem_wait(&rdr); // Add reader to critical section
     // Reader acquire the lock before modifying numreader
@@ -50,15 +50,49 @@ void *reader(void *rno)
     return NULL;
 }
 
+// Counting wrapper for BSems
+typedef struct {
+    int val;
+    sem_t gate;
+    sem_t mutex;
+} CSem;
+
+// 
+
+/*
+void Pc(): Add entity to sockets[K] and decrement K
+void Vc(): Remove entity from sockets[K] and increment K
+*/
+void Pc(CSem* csem) { 
+    sem_wait(&csem->gate);
+    sem_wait(&csem->mutex);
+    csem->val--;
+    if (csem->val > 0) {
+        sem_post(&csem->gate);
+    }
+    sem_post(&csem->mutex);
+}
+
+void Vc(CSem* csem) {
+    sem_wait(&csem->mutex);
+    csem->val++;
+    if (csem->val == 1) {
+        sem_post(&csem->gate);
+    }
+    sem_post(&csem->mutex);
+}
+
+
 int main()
-{   
+{
+    CSem *csem = malloc(sizeof(CSem));
 
     pthread_t read[10],write[5];
-    pthread_mutex_init(&mutex, NULL);
-    sem_init(&wrt,0,1);
-    sem_init(&rdr,0,MAXRDR);
+    csem->val = K;
+    sem_init(&csem->gate, 0, (K > 0 ? 1 : 0)); // 1 = open
+    sem_init(&csem->mutex, 0, 1);  // " "
 
-    int a[10] = {1,2,3,4,5,6,7,8,9,10}; //Just used for numbering the producer and consumer
+    int a[10] = {1,2,3,4,5,6,7,8,9,10}; // Just used for numbering the producer and consumer
 
     for(int i = 0; i < 10; i++) {
         pthread_create(&read[i], NULL, (void *)reader, (void *)&a[i]);
