@@ -15,6 +15,14 @@ pthread_mutex_t mutex;
 int cnt = 1;
 int numreader = 0;
 
+// Counting wrapper for BSems
+typedef struct {
+    int val;
+    sem_t gate;
+    sem_t mutex;
+} CSem;
+
+
 void *writer(void *wno, CSem* csem)
 {   
     sem_wait(&wrt);
@@ -50,12 +58,6 @@ void *reader(void *rno, CSem* csem)
     return NULL;
 }
 
-// Counting wrapper for BSems
-typedef struct {
-    int val;
-    sem_t gate;
-    sem_t mutex;
-} CSem;
 
 // 
 
