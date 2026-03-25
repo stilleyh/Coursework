@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
 This program provides a possible solution for first readers writers problem using mutex and semaphore.
