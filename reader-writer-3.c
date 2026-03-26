@@ -42,6 +42,31 @@ void sigint_handler(int sig) {
     }
 }
 
+/*
+void Pc(): Add entity to sockets[K] and decrement K
+void Vc(): Remove entity from sockets[K] and increment K
+*/
+void Pc(CSem* csem) { 
+    sem_wait(&csem->gate);
+    sem_wait(&csem->mutex);
+    csem->val--;
+    if (csem->val > 0) {
+        sem_post(&csem->gate);
+    }
+    sem_post(&csem->mutex);
+}
+
+void Vc(CSem* csem) {
+    sem_wait(&csem->mutex);
+    csem->val++;
+    if (csem->val == 1) {
+        sem_post(&csem->gate);
+    }
+    sem_post(&csem->mutex);
+}
+
+
+
 // Reader thread function
 void *reader(void *arg) {
     int id = *((int *)arg);
@@ -86,29 +111,6 @@ void writer_process(int id, CSem *shared_csem, Shared *shared_mem) {
         exit(0); // terminate child process
     }
 }
-/*
-void Pc(): Add entity to sockets[K] and decrement K
-void Vc(): Remove entity from sockets[K] and increment K
-*/
-void Pc(CSem* csem) { 
-    sem_wait(&csem->gate);
-    sem_wait(&csem->mutex);
-    csem->val--;
-    if (csem->val > 0) {
-        sem_post(&csem->gate);
-    }
-    sem_post(&csem->mutex);
-}
-
-void Vc(CSem* csem) {
-    sem_wait(&csem->mutex);
-    csem->val++;
-    if (csem->val == 1) {
-        sem_post(&csem->gate);
-    }
-    sem_post(&csem->mutex);
-}
-
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
