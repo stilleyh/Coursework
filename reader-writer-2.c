@@ -8,7 +8,7 @@ This program provides a possible solution for first readers writers problem usin
 I have used 10 readers and 5 producers to demonstrate the solution. You can always play with these values.
 */
 
-#define K 5
+#define K 3
 
 sem_t wrt;
 sem_t rdr;

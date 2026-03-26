@@ -7,7 +7,7 @@ This program provides a possible solution for first readers writers problem usin
 I have used 10 readers and 5 producers to demonstrate the solution. You can always play with these values.
 */
 
-#define MAXRDR 5
+#define N 3
 
 sem_t wrt;
 sem_t rdr;
@@ -56,7 +56,7 @@ int main()
     pthread_t read[10],write[5];
     pthread_mutex_init(&mutex, NULL);
     sem_init(&wrt,0,1);
-    sem_init(&rdr,0,MAXRDR);
+    sem_init(&rdr,0,N);
 
     int a[10] = {1,2,3,4,5,6,7,8,9,10}; //Just used for numbering the producer and consumer
 
