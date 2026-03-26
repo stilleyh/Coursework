@@ -12,8 +12,6 @@
 #define NUM_WRITERS 5
 
 int num_readers;
-void Pc(CSem* csem);
-void Vc(CSem* csem);
 
 volatile int done = 0;  // termination detection flag
 
@@ -23,6 +21,10 @@ typedef struct {
     sem_t gate;
     sem_t mutex;
 } CSem;
+
+void Pc(CSem* csem);
+void Vc(CSem* csem);
+
 
 // Shared memory structure
 typedef struct {
