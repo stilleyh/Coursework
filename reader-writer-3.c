@@ -11,7 +11,7 @@
 #define NUM_READERS 10
 #define NUM_WRITERS 5
 
-
+int num_readers;
 void Pc(CSem* csem);
 void Vc(CSem* csem);
 
@@ -37,7 +37,7 @@ Shared *shared_mem;
 // For graceful termination
 void sigint_handler(int sig) {
     done = 1;
-    for (int i = 0; i < NUM_READERS; i++) {
+    for (int i = 0; i < num_readers; i++) {
         sem_post(&shared_mem->read_sem);
     }
 }
